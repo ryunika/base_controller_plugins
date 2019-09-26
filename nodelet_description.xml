@@ -1,0 +1,5 @@
+<library path="lib/libbase_controller_plugins">
+  <class name="base_controller_plugins/Omni4" type="base_controller_plugins::Omni4" base_class_type="nodelet::Nodelet">
+    <description>omni4</description>
+  </class>
+</library>
