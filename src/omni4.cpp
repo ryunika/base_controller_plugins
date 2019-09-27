@@ -92,7 +92,6 @@ namespace base_controller_plugins{
   	_nh.param("invert_y", this->InvertY, false);
   	_nh.param("invert_z", this->InvertZ, false);
   
-  	cmdVel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 10, &Omni4::CmdVelCallback, this);
   
   	motor0CmdVel_pub = nh.advertise<std_msgs::Float64>("motor0_cmd_vel", 1);
   	motor1CmdVel_pub = nh.advertise<std_msgs::Float64>("motor1_cmd_vel", 1);
@@ -114,6 +113,7 @@ namespace base_controller_plugins{
     odom_twist = nav_msgs::Odometry();
     odom_twist_pub = nh.advertise<nav_msgs::Odometry>("odom_twist", 10);
 
+  	cmdVel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 10, &Omni4::CmdVelCallback, this);
     //main
   	NODELET_INFO("base_controller node has started.");
   }

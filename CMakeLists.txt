@@ -11,6 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
   pluginlib
   roscpp
+  std_msgs
+  nav_msgs
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -104,8 +107,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES base_controller_plugins
-#  CATKIN_DEPENDS nodelet pluginlib roscpp
+  LIBRARIES base_controller_plugins
+  CATKIN_DEPENDS nodelet pluginlib roscpp std_msgs nav_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
