@@ -126,6 +126,7 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
   src/omni4.cpp
+  src/omni3.cpp
 )
 
 ## Add cmake target dependencies of the library

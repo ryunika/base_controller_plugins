@@ -17,7 +17,7 @@
 
 namespace base_controller_plugins{
 
-  class Omni4 : public nodelet::Nodelet
+  class Omni3 : public nodelet::Nodelet
   {
   public:
     virtual void onInit();
@@ -48,7 +48,6 @@ namespace base_controller_plugins{
   	ros::Publisher motor0CmdVel_pub;
   	ros::Publisher motor1CmdVel_pub;
   	ros::Publisher motor2CmdVel_pub;
-  	ros::Publisher motor3CmdVel_pub;
   
   	double targetVelX;
   	double targetVelY;
@@ -57,14 +56,14 @@ namespace base_controller_plugins{
   	double current_time = 0.0;
   	double last_time = 0.0;
   
-  	double lastTarget[4];
-  	std_msgs::Float64 motorCmdVelmsg[4];
+  	double lastTarget[3];
+  	std_msgs::Float64 motorCmdVelmsg[3];
   
     nav_msgs::Odometry odom_twist;
   	ros::Publisher odom_twist_pub;
   };
   
-  void Omni4::onInit(){
+  void Omni3::onInit(){
     nh = getNodeHandle();
     //constructor
     _nh = getPrivateNodeHandle();
@@ -96,29 +95,26 @@ namespace base_controller_plugins{
   	motor0CmdVel_pub = nh.advertise<std_msgs::Float64>("motor0_cmd_vel", 1);
   	motor1CmdVel_pub = nh.advertise<std_msgs::Float64>("motor1_cmd_vel", 1);
   	motor2CmdVel_pub = nh.advertise<std_msgs::Float64>("motor2_cmd_vel", 1);
-  	motor3CmdVel_pub = nh.advertise<std_msgs::Float64>("motor3_cmd_vel", 1);
   
   	targetVelX = targetVelY = targetRotZ = 0.0;
   
   	lastTarget[0] = 0.0;
   	lastTarget[1] = 0.0;
   	lastTarget[2] = 0.0;
-    lastTarget[3] = 0.0;
   
   	motorCmdVelmsg[0].data = 0.0;
   	motorCmdVelmsg[1].data = 0.0;
   	motorCmdVelmsg[2].data = 0.0;
-    motorCmdVelmsg[3].data = 0.0;
   
     odom_twist = nav_msgs::Odometry();
     odom_twist_pub = nh.advertise<nav_msgs::Odometry>("odom_twist", 10);
 
-  	cmdVel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 10, &Omni4::CmdVelCallback, this);
+  	cmdVel_sub = nh.subscribe<geometry_msgs::Twist>("cmd_vel", 10, &Omni3::CmdVelCallback, this);
     //main
   	NODELET_INFO("base_controller node has started.");
   }
   
-  void Omni4::CmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg)
+  void Omni3::CmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg)
   {
   	this->targetVelX = static_cast<double>(msg->linear.x);
   	this->targetVelY = static_cast<double>(msg->linear.y);
@@ -142,13 +138,12 @@ namespace base_controller_plugins{
   	motor0CmdVel_pub.publish(motorCmdVelmsg[0]);
   	motor1CmdVel_pub.publish(motorCmdVelmsg[1]);
   	motor2CmdVel_pub.publish(motorCmdVelmsg[2]);
-  	motor3CmdVel_pub.publish(motorCmdVelmsg[3]);
   
   	last_time = current_time;
   
-   odom_twist.header.frame_id = "/omni4/odom";
+   odom_twist.header.frame_id = "/omni3/odom";
    odom_twist.header.stamp = ros::Time::now();
-   odom_twist.child_frame_id = "/omni4/odom_link";
+   odom_twist.child_frame_id = "/omni3/odom_link";
    odom_twist.twist.covariance = {
    0.5, 0, 0, 0, 0, 0,  // covariance on gps_x
    0, 0.5, 0, 0, 0, 0,  // covariance on gps_y
@@ -160,18 +155,17 @@ namespace base_controller_plugins{
    odom_twist_pub.publish(odom_twist);
   }
   
-  void Omni4::CalcWheelSpeed(double actualDt){
-  	double t[4];
+  void Omni3::CalcWheelSpeed(double actualDt){
+  	double t[3];
   
-  	t[0] = -((targetVelX * sin(1 * M_PI / 4))	+ (targetVelY * cos(1 * M_PI / 4)) 	+ (targetRotZ * RobotRadius)) / wheel_radius;
-  	t[1] = -((targetVelX * sin(3 * M_PI / 4))	+ (targetVelY * cos(3 * M_PI / 4)) 	+ (targetRotZ * RobotRadius)) / wheel_radius;
-  	t[2] = -((targetVelX * sin(5 * M_PI / 4))	+ (targetVelY * cos(5 * M_PI / 4)) 	+ (targetRotZ * RobotRadius)) / wheel_radius;
-    t[3] = -((targetVelX * sin(7 * M_PI / 4))	+ (targetVelY * cos(7 * M_PI / 4)) 	+ (targetRotZ * RobotRadius)) / wheel_radius;
+    t[0] = -(									  (targetVelY * 1)						+ (targetRotZ * RobotRadius)) / wheel_radius;
+    t[1] = -((targetVelX * sin( 2 * M_PI / 3))	+ (targetVelY * cos( 2 * M_PI / 3)) 	+ (targetRotZ * RobotRadius)) / wheel_radius;
+    t[2] = -((targetVelX * sin(-2 * M_PI / 3))	+ (targetVelY * cos(-2 * M_PI / 3)) 	+ (targetRotZ * RobotRadius)) / wheel_radius;
   
   	double _k = 1.0;
   
   	if(this->LimitVelocity){
-  		for(int i = 0; i < 4; i++){
+  		for(int i = 0; i < 3; i++){
   			auto _a = fabs(t[i]);
   			if(_a * _k > this->MaximumVelocity){
   				_k = this->MaximumVelocity / _a;
@@ -179,7 +173,7 @@ namespace base_controller_plugins{
   			}
   		}
   
-  		for(int i = 0; i < 4; i++){
+  		for(int i = 0; i < 3; i++){
   			t[i] *= _k;
   		}
   	}
@@ -189,7 +183,7 @@ namespace base_controller_plugins{
   
   		_k = 1.0;
   
-  		for(int i = 0; i < 4; i++){
+  		for(int i = 0; i < 3; i++){
   			double diffabs = fabs(t[i] - lastTarget[i]);
   			if(diffabs * _k > maxVelDelta){
   				_k = maxVelDelta / diffabs;
@@ -197,16 +191,16 @@ namespace base_controller_plugins{
   			}
   		}
   
-  		for(int i = 0; i < 4; i++){
+  		for(int i = 0; i < 3; i++){
   			t[i] = lastTarget[i] + ((t[i] - lastTarget[i]) * _k);
   		}
   	}
   
-  	for(int i = 0; i < 4; i++){
+  	for(int i = 0; i < 3; i++){
   		this->lastTarget[i] = t[i];
   		this->motorCmdVelmsg[i].data = t[i];
   	}
   }
   
 }// namespace base_controller_plugins
-PLUGINLIB_EXPORT_CLASS(base_controller_plugins::Omni4, nodelet::Nodelet);
+PLUGINLIB_EXPORT_CLASS(base_controller_plugins::Omni3, nodelet::Nodelet);
