@@ -127,6 +127,7 @@ include_directories(
 add_library(${PROJECT_NAME}
   src/omni4.cpp
   src/omni3.cpp
+  src/vel_control.cpp
 )
 
 ## Add cmake target dependencies of the library
