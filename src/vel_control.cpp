@@ -25,7 +25,7 @@ namespace base_controller_plugins{
 		ros::Timer control_tim;
 		double limit[2];
 		double vel=0;
-		static constexpr double ctrl_freq = 1000;
+		double ctrl_freq;
   	void TimerCallback(const ros::TimerEvent& event);
 		void VelCallback(const std_msgs::Float64::ConstPtr& msg); 
   };
@@ -34,6 +34,10 @@ namespace base_controller_plugins{
 		nh = getNodeHandle();
     nh_priv = getPrivateNodeHandle();
 		position.data = 0;
+		if (!nh_priv.getParam("ctrl_freq", ctrl_freq))
+  	{
+    	ctrl_freq = 500;
+  	}
 		if(!nh_priv.getParam("lower_limit", limit[0]))
     {
       limit[0] = 0;
@@ -43,7 +47,7 @@ namespace base_controller_plugins{
       limit[1] = 6.28;
     }
 		pos_pub = nh.advertise<std_msgs::Float64>("pos", 1);
-		vel_sub	= nh.subscribe<std_msgs::Float64>("vel", 10, &Vel_control::VelCallback, this);
+		vel_sub	= nh.subscribe<std_msgs::Float64>("vel", 1000, &Vel_control::VelCallback, this);
 		control_tim = nh.createTimer(ros::Duration(1/ctrl_freq), &Vel_control::TimerCallback, this);
 	}
 
