@@ -93,10 +93,10 @@ namespace base_controller_plugins{
   	_nh.param("invert_z", this->InvertZ, false);
   
   
-  	motor0CmdVel_pub = nh.advertise<std_msgs::Float64>("motor0_cmd_vel", 1);
-  	motor1CmdVel_pub = nh.advertise<std_msgs::Float64>("motor1_cmd_vel", 1);
-  	motor2CmdVel_pub = nh.advertise<std_msgs::Float64>("motor2_cmd_vel", 1);
-  	motor3CmdVel_pub = nh.advertise<std_msgs::Float64>("motor3_cmd_vel", 1);
+  	motor0CmdVel_pub = nh.advertise<std_msgs::Float64>("motor0_cmd_val", 1);
+  	motor1CmdVel_pub = nh.advertise<std_msgs::Float64>("motor1_cmd_val", 1);
+  	motor2CmdVel_pub = nh.advertise<std_msgs::Float64>("motor2_cmd_val", 1);
+  	motor3CmdVel_pub = nh.advertise<std_msgs::Float64>("motor3_cmd_val", 1);
   
   	targetVelX = targetVelY = targetRotZ = 0.0;
   
