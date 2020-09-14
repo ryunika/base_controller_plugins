@@ -35,6 +35,7 @@ namespace base_controller_plugins{
   	bool InvertX = false;
   	bool InvertY = false;
   	bool InvertZ = false;
+		bool SwapXY = false; 
   
   	bool LimitVelocity = true;
   	bool LimitAcceleration = true;
@@ -91,7 +92,7 @@ namespace base_controller_plugins{
   	_nh.param("invert_x", this->InvertX, false);
   	_nh.param("invert_y", this->InvertY, false);
   	_nh.param("invert_z", this->InvertZ, false);
-  
+		_nh.param("swap_x_y", this->SwapXY, false);
   
   	motor0CmdVel_pub = nh.advertise<std_msgs::Float64>("motor0_cmd_val", 1);
   	motor1CmdVel_pub = nh.advertise<std_msgs::Float64>("motor1_cmd_val", 1);
@@ -120,8 +121,17 @@ namespace base_controller_plugins{
   
   void Omni4::CmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg)
   {
-  	this->targetVelX = static_cast<double>(msg->linear.x);
-  	this->targetVelY = static_cast<double>(msg->linear.y);
+		if(this->SwapXY)
+		{
+  		this->targetVelX = static_cast<double>(msg->linear.y);
+  		this->targetVelY = static_cast<double>(msg->linear.x);
+		}
+		else
+		{
+  		this->targetVelX = static_cast<double>(msg->linear.x);
+  		this->targetVelY = static_cast<double>(msg->linear.y);
+		}
+		
   	this->targetRotZ = static_cast<double>(msg->angular.z);
   
   	if(this->InvertX)
